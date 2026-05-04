@@ -27,6 +27,13 @@ class SearchSongResource(Resource):
                 "message" : "Failed to fetch songs"
             },500
         
+        for s in songs:
+            existing=Song.query.filter_by(song_id=s["song_id"]).first()
+            if not existing :
+                song=Song(**s)
+                db.session.add(song)
+        db.session.commit()
+
         logging.info(f"Search song with query parameter: {query}")
         return {
             "status" : "success",

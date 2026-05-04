@@ -2,7 +2,7 @@ import random
 import requests
 import logging
 from sqlalchemy import or_
-from app.models import LikedSongs
+from app.models import LikedSongs, Song
 
 ITUNES_URL= "https://itunes.apple.com/search"
 
@@ -37,22 +37,40 @@ def search_songs(query):
 def get_recommendation(user_id):
     liked_songs=LikedSongs.query.filter_by(user_id=user_id).all()
     if not liked_songs :
-        return []
-    artists=[song.artist for song in liked_songs]
-    albums=[song.album for song in liked_songs]
-    liked_ids={song.song_id for song in liked_songs}
-    songs=LikedSongs.query.filter(
-        or_(LikedSongs.artist.in_(artists),
-            LikedSongs.album.in_(albums)
+        all_songs=Song.query.all()
+        random.shuffle(all_songs)
+        return all_songs[:10]
+    
+    artists=[s.song.artist for s in liked_songs]
+    albums=[s.song.album for s in liked_songs]
+    if not artists and not albums:
+        all_songs=Song.query.all()
+        random.shuffle(all_songs)
+        return all_songs[:10]
+    
+    liked_ids={s.song_id for s in liked_songs}
+
+    songs=Song.query.filter(
+        or_(Song.artist.in_(artists),
+            Song.album.in_(albums)
             )
         ).all()
+    
     unique={}
-    for song in songs :
-        if song.song_id not in liked_ids:
-            unique[song.song_id]=song
+
+    for s in songs :
+        if s.id not in liked_ids:
+            unique[s.id]=s
+
     result=list(unique.values())
-    random.shuffle(result)
+    
     #used list for artists since we just want a collection of items 
     #used a set for liked_ids since we are checking membership and TC for this operation in sets is O(1) while in list it would be O(n)
     #used dictionary for unique since we want unique songs only secondly we can easily acces the values while constructing the result
+    if not result :
+        all_songs=Song.query.all()
+        random.shuffle(all_songs)
+        return all_songs[:10]
+
+    random.shuffle(result)
     return result[:10]

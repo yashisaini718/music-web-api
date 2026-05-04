@@ -20,7 +20,7 @@ class Song(db.Model):
     album=db.Column(db.String(200),index=True)
     image=db.Column(db.String(300))
     preview=db.Column(db.String(300))
-    liked_by = db.relationship("LikeSongs", back_populates="song")
+    liked_by = db.relationship("LikedSongs", back_populates="song")
 
 # for Foreign Key the song_id represented is not he track_id but the id of the song when stored in the song db
 class LikedSongs(db.Model):

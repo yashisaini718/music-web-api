@@ -23,20 +23,7 @@ def create_app(config_class=Config):
     from app.songs.routes import songs
     from app.playlist.routes import playlist
     from app.handlers.errors import error
-    from app.handlers import jwt_handlers
-
-   # with app.app_context():
-   #     db.create_all()
-
-    with app.app_context():
-        from app.utils import cleanup_expired_tokens
-        try:
-            cleanup_expired_tokens()
-            app.logger.info(f"Deleted expired tokens")
-        except Exception as e:
-            app.logger.warning(f"Token cleanup failed: {e}")
-        from app.songs.hardcode_db import seed_songs
-        seed_songs()
+    from app.handlers import jwt_handlers    
         
     app.register_blueprint(auth)
     app.register_blueprint(songs)
