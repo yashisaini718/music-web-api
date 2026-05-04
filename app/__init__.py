@@ -35,7 +35,9 @@ def create_app(config_class=Config):
             app.logger.info(f"Deleted expired tokens")
         except Exception as e:
             app.logger.warning(f"Token cleanup failed: {e}")
-
+        from app.songs.hardcode_db import seed_songs
+        seed_songs()
+        
     app.register_blueprint(auth)
     app.register_blueprint(songs)
     app.register_blueprint(playlist)

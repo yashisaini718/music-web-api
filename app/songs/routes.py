@@ -2,7 +2,7 @@ from flask import Blueprint, request
 from app.songs.services import search_songs, get_recommendation
 from flask_restful import Api,Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.models import LikedSongs
+from app.models import LikedSongs, Song
 from app import db
 from app.schema import LikeSongSchema, SongSchema
 import logging
@@ -38,8 +38,15 @@ class LikeSongResource(Resource):
     def post(self):
         user_id=int(get_jwt_identity())
         data=request.get_json()
-        schema=LikeSongSchema()
+        schema=SongSchema()
         validated_data=schema.load(data)
+
+        song=Song.query.filter_by(song_id=validated_data["song_id"]).first()
+        if song not in Song:
+            song=Song(**validated_data)
+            db.session.add(song)
+            db.session.commit()
+
         existing=LikedSongs.query.filter_by(
             user_id=user_id,song_id=validated_data["song_id"]
         ).first()
@@ -49,8 +56,9 @@ class LikeSongResource(Resource):
                 "status" :"fail",
                 "message" : "Already Liked!"
             },409
-        song=LikedSongs(user_id=user_id, **validated_data)
-        db.session.add(song)
+        
+        liked_song=LikedSongs(user_id=user_id,song_id=song.id)
+        db.session.add(liked_song)
         db.session.commit()
         logging.info(f"User {user_id} liked song {validated_data['song_id']}")
         return {
@@ -68,11 +76,6 @@ class GetLikedSongResource(Resource):
         results_query=LikedSongs.query.filter_by(user_id=user_id)
         results=results_query.paginate(page=page,per_page=limit, error_out=False)
         if not results.items:
-            #return {
-            #    "status" : "fail",
-            #   "message" : "Songs not found!"
-            
-            #},404
             return {
                 "status": "success",
                 "data": [],
@@ -81,11 +84,18 @@ class GetLikedSongResource(Resource):
                     "total": 0
                 }
             },200
+
+        songs= [like.song for like in results.items if like.song]
+
+        ''' the above line is a query that creates a songs list for each LikedSongs object
+        like is a single LikedSong object and like.song relates the song to song model
+        results.items store LikedSongs object that only have song_id and user_id '''
+
         schema=SongSchema(many=True)
         logging.info(f"Fetched liked songs for user {user_id}")
         return {
             "status" : "success",
-            "data" : schema.dump(results.items),
+            "data" : schema.dump(songs),
             "pagination": {
                 "page": page,
                 "total": results.total
@@ -95,6 +105,7 @@ class GetLikedSongResource(Resource):
 class DeleteLikedSongResource(Resource):
     @jwt_required()
     def delete(self,song_id):
+        # song_id sent here is not the trackid from itunes app
         user_id=int(get_jwt_identity())
         song=LikedSongs.query.filter_by(song_id=song_id,user_id=user_id).first()
         if not song :

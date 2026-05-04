@@ -15,7 +15,7 @@ class UserResponseSchema(Schema):
     username = fields.Str()
     email = fields.Email()
 
-class LikeSongSchema(Schema):
+class SongSchema(Schema):
     id=fields.Int(dump_only=True)
     song_id=fields.Int(required=True)
     title=fields.Str(required=True)
@@ -24,14 +24,9 @@ class LikeSongSchema(Schema):
     image=fields.Str()
     preview=fields.Str()
 
-class SongSchema(Schema):
-    id=fields.Int()
+class LikeSongSchema(Schema):
+    id=fields.Int(dump_only=True)
     song_id = fields.Int()
-    title=fields.Str()
-    artist=fields.Str()
-    album=fields.Str()
-    image=fields.Str()
-    preview=fields.Str()
 
 class PlaylistCreateSchema(Schema):
     id=fields.Int(dump_only=True)

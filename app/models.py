@@ -2,6 +2,7 @@ from app import db
 from datetime import datetime, timezone
 
 class User(db.Model):
+    __tablename__="user"
     id=db.Column(db.Integer, primary_key=True)
     username=db.Column(db.String(20), unique=True, nullable=False)
     email=db.Column(db.String(120),unique=True, nullable=False)
@@ -10,23 +11,34 @@ class User(db.Model):
     def __repr__(self):
         return f"<User {self.username}, {self.email}, {self.password}>"
     
-class LikedSongs(db.Model):
+class Song(db.Model):
+    __tablename__="song"
     id=db.Column(db.Integer,primary_key=True)
-    user_id=db.Column(db.Integer, db.ForeignKey('user.id'),nullable=False)
-    song_id=db.Column(db.BigInteger())
+    song_id=db.Column(db.BigInteger(),unique=True,index=True)
     title=db.Column(db.String(200))
-    artist=db.Column(db.String(200))
-    album=db.Column(db.String(200))
+    artist=db.Column(db.String(200),index=True)
+    album=db.Column(db.String(200),index=True)
     image=db.Column(db.String(300))
     preview=db.Column(db.String(300))
+    liked_by = db.relationship("LikeSongs", back_populates="song")
+
+# for Foreign Key the song_id represented is not he track_id but the id of the song when stored in the song db
+class LikedSongs(db.Model):
+    __tablename__="liked_songs"
+    id=db.Column(db.Integer,primary_key=True)
+    user_id=db.Column(db.Integer, db.ForeignKey('user.id'),nullable=False)
+    song_id=db.Column(db.Integer(),db.ForeignKey('song.id'),nullable=False)
     user=db.relationship('User',backref="liked_songs")
+    song=db.relationship('Song',back_populates="liked_by" )
 
 class Playlist(db.Model):
+    __tablename__="playlist"
     id=db.Column(db.Integer, primary_key=True)
     name=db.Column(db.String(200),nullable=False)
     user_id=db.Column(db.Integer,db.ForeignKey('user.id'),nullable=False)
 
 class PlaylistSong(db.Model):
+    __tablename__="playlist_song"
     id=db.Column(db.Integer(),primary_key=True)
     playlist_id=db.Column(db.Integer(),db.ForeignKey('playlist.id'))
     song_id=db.Column(db.BigInteger())

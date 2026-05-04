@@ -213,3 +213,4 @@ __pycache__/
 instance/
 .env.*
 *.sqlite3
+*.log
