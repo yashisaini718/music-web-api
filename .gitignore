@@ -143,6 +143,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+testenv
 
 # Spyder project settings
 .spyderproject
@@ -214,3 +215,5 @@ instance/
 .env.*
 *.sqlite3
 *.log
+
+.vscode/

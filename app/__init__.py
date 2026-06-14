@@ -1,7 +1,8 @@
 from flask import Flask
 from app.config import Config
-from app.extensions import db, bcrypt, jwt, migrate
+from app.extensions import db, bcrypt, jwt, migrate,cors
 import logging
+from flasgger import Swagger
 
 logging.basicConfig(
     filename="app.log",
@@ -9,15 +10,34 @@ logging.basicConfig(
     format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
+swagger_template = {
+    "swagger": "2.0",
+    "info": {
+        "title": "Music Recommender API",
+        "description": "API documentation for Music Recommender",
+        "version": "1.0.0"
+    },
+    "securityDefinitions": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+            "description": "Enter: Bearer <your_token>"
+        }
+    }
+}
+
 # define application factory 
 def create_app(config_class=Config):
     app=Flask(__name__)
+    swagger=Swagger(app, template=swagger_template)
     app.config.from_object(config_class)
-
     db.init_app(app)
     bcrypt.init_app(app)
     jwt.init_app(app)
     migrate.init_app(app,db)
+    #swagger.init_app(app)
+    cors.init_app(app)
 
     from app.auth.routes import auth
     from app.songs.routes import songs

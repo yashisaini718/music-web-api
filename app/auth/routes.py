@@ -6,7 +6,7 @@ from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identi
 from app.schema import RegisterSchema, LoginSchema, UserResponseSchema
 import logging
 from datetime import datetime
-
+from flasgger import swag_from
 
 auth=Blueprint("auth",__name__,url_prefix="/api/auth")
 api=Api(auth)
@@ -14,6 +14,54 @@ api=Api(auth)
 ### not added db.rollback in case of errors like when registration fails we shoudl rollback the db 
 
 class RegistrationResource(Resource):
+    @swag_from({
+        "tags": ["Auth"],
+        "summary": "Register a new user",
+        "parameters": [
+            {
+                "in": "body",
+                "name": "body",
+                "required": True,
+                "schema": {
+                    "required": ["username", "email", "password"],
+                    "properties": {
+                        "username": {
+                            "type": "string",
+                            "example": "john_doe"
+                        },
+                        "email": {
+                            "type": "string",
+                            "example": "john@example.com"
+                        },
+                        "password": {
+                            "type": "string",
+                            "example": "secret123"
+                        }
+                    }
+                }
+            }
+        ],
+        "responses": {
+            "201": {
+                "description": "User registered successfully",
+                "schema": {
+                    "properties": {
+                        "status": {"type": "string", "example": "success"},
+                        "message": {"type": "string", "example": "User registered successfully!"}
+                    }
+                }
+            },
+            "400": {
+                "description": "Username or email already exists",
+                "schema": {
+                    "properties": {
+                        "status": {"type": "string", "example": "fail"},
+                        "message": {"type": "string", "example": "Username already exists"}
+                    }
+                }
+            }
+        }
+    })
     def post(self):
         data=request.get_json()
         
@@ -49,6 +97,56 @@ class RegistrationResource(Resource):
         },201
 
 class LoginResource(Resource):
+    @swag_from({
+        "tags": ["Auth"],
+        "summary": "Login and receive access and refresh tokens",
+        "parameters": [
+            {
+                "in": "body",
+                "name": "body",
+                "required": True,
+                "schema": {
+                    "required": ["email", "password"],
+                    "properties": {
+                        "email": {
+                            "type": "string",
+                            "example": "john@example.com"
+                        },
+                        "password": {
+                            "type": "string",
+                            "example": "secret123"
+                        }
+                    }
+                }
+            }
+        ],
+        "responses": {
+            "200": {
+                "description": "Login successful, returns tokens",
+                "schema": {
+                    "properties": {
+                        "status": {"type": "string", "example": "success"},
+                        "data": {
+                            "type": "object",
+                            "properties": {
+                                "access_token": {"type": "string", "example": "eyJhbGci..."},
+                                "refresh_token": {"type": "string", "example": "eyJhbGci..."}
+                            }
+                        }
+                    }
+                }
+            },
+            "401": {
+                "description": "Invalid credentials",
+                "schema": {
+                    "properties": {
+                        "status": {"type": "string", "example": "fail"},
+                        "message": {"type": "string", "example": "Invalid credentials!"}
+                    }
+                }
+            }
+        }
+    })
     def post(self):
         data=request.get_json()
 
@@ -82,6 +180,47 @@ class LoginResource(Resource):
         },200
 
 class MeResource(Resource):
+    @swag_from({
+        "tags": ["Auth"],
+        "summary": "Get current logged in user details",
+        "parameters": [
+            {
+                "in": "header",
+                "name": "Authorization",
+                "required": True,
+                "type": "string",
+                "description": "Bearer <access_token>",
+                "example": "Bearer eyJhbGci..."
+            }
+        ],
+        "responses": {
+            "200": {
+                "description": "Returns current user data",
+                "schema": {
+                    "properties": {
+                        "status": {"type": "string", "example": "success"},
+                        "data": {
+                            "type": "object",
+                            "properties": {
+                                "id": {"type": "integer", "example": 1},
+                                "username": {"type": "string", "example": "john_doe"},
+                                "email": {"type": "string", "example": "john@example.com"}
+                            }
+                        }
+                    }
+                }
+            },
+            "404": {
+                "description": "User not found",
+                "schema": {
+                    "properties": {
+                        "status": {"type": "string", "example": "fail"},
+                        "message": {"type": "string", "example": "No User Found !"}
+                    }
+                }
+            }
+        }
+    })
     @jwt_required()
     def get(self):    
         user_id=int(get_jwt_identity())
@@ -103,6 +242,36 @@ class MeResource(Resource):
         },200
 
 class RefreshResource(Resource):
+    @swag_from({
+        "tags": ["Auth"],
+        "summary": "Get a new access token using refresh token",
+        "parameters": [
+            {
+                "in": "header",
+                "name": "Authorization",
+                "required": True,
+                "type": "string",
+                "description": "Bearer <refresh_token>",
+                "example": "Bearer eyJhbGci..."
+            }
+        ],
+        "responses": {
+            "200": {
+                "description": "Returns new access token",
+                "schema": {
+                    "properties": {
+                        "status": {"type": "string", "example": "success"},
+                        "data": {
+                            "type": "object",
+                            "properties": {
+                                "access_token": {"type": "string", "example": "eyJhbGci..."}
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    })
     @jwt_required(refresh=True)
     def post(self):
         user_id=get_jwt_identity()
@@ -118,6 +287,31 @@ class RefreshResource(Resource):
     
 
 class LogoutResource(Resource):
+    @swag_from({
+        "tags": ["Auth"],
+        "summary": "Logout and revoke access token",
+        "parameters": [
+            {
+                "in": "header",
+                "name": "Authorization",
+                "required": True,
+                "type": "string",
+                "description": "Bearer <access_token>",
+                "example": "Bearer eyJhbGci..."
+            }
+        ],
+        "responses": {
+            "200": {
+                "description": "Access token revoked successfully",
+                "schema": {
+                    "properties": {
+                        "status": {"type": "string", "example": "success"},
+                        "message": {"type": "string", "example": "Access token revoked"}
+                    }
+                }
+            }
+        }
+    })
     @jwt_required()
     def post(self):
         jwt_data=get_jwt()
@@ -136,6 +330,31 @@ class LogoutResource(Resource):
         }, 200
         
 class LogoutRefreshResource(Resource):
+    @swag_from({
+        "tags": ["Auth"],
+        "summary": "Logout and revoke refresh token",
+        "parameters": [
+            {
+                "in": "header",
+                "name": "Authorization",
+                "required": True,
+                "type": "string",
+                "description": "Bearer <refresh_token>",
+                "example": "Bearer eyJhbGci..."
+            }
+        ],
+        "responses": {
+            "200": {
+                "description": "Refresh token revoked successfully",
+                "schema": {
+                    "properties": {
+                        "status": {"type": "string", "example": "success"},
+                        "message": {"type": "string", "example": "Refresh token revoked"}
+                    }
+                }
+            }
+        }
+    })
     @jwt_required(refresh=True)
     def post(self):
         jwt_data=get_jwt()
