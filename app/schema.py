@@ -39,7 +39,7 @@ class PlaylistResponseSchema(Schema):
 class PlaylistSongCreateSchema(Schema):
     id=fields.Int(dump_only=True)
     song_id = fields.Int(required=True)
-    title=fields.Str()
+    title=fields.Str(required=True)
     artist=fields.Str()
     album=fields.Str()
     image=fields.Str()

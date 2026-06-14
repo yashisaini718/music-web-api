@@ -1,7 +1,7 @@
 from flask import Blueprint, request
 from flask_restful import Api,Resource
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from app.models import Playlist, PlaylistSong
+from app.models import Playlist, PlaylistSong, Song
 from app import db
 from app.schema import PlaylistCreateSchema, PlaylistResponseSchema, PlaylistSongCreateSchema, PlaylistSongResponseSchema
 import logging
@@ -258,11 +258,35 @@ class AddPlaylistSongResource(Resource):
                 "required": True,
                 "schema": {
                     "type": "object",
-                    "required": ["song_id"],
+                    "required": [
+                        "song_id",
+                        "title",
+                        "artist"
+                    ],
                     "properties": {
                         "song_id": {
+                            "type": "integer",
+                            "example": 1440936036
+                        },
+                        "title": {
+                        "type": "string",
+                        "example": "Wildest Dreams"
+                        },
+                        "artist": {
                             "type": "string",
-                            "example": "spotify:track:3n3Ppam7vgaVa1iaRUIOKE"
+                            "example": "Taylor Swift"
+                        },
+                        "album": {
+                            "type": "string",
+                            "example": "1989"
+                        },
+                        "image": {
+                            "type": "string",
+                            "example": "https://image-url.jpg"
+                        },
+                        "preview": {
+                            "type": "string",
+                            "example": "https://preview-url.m4a"
                         }
                     }
                 }
@@ -338,6 +362,10 @@ class AddPlaylistSongResource(Resource):
                 "message" : "Song already added to playlist!"
             },409
         #step 4 add song to db
+        found=Song.query.filter_by(song_id=validated_data["song_id"]).first()
+        if not found:
+            found=Song(**validated_data)
+            db.session.add(found)
         song = PlaylistSong(playlist_id=playlist_id, **validated_data)
         db.session.add(song)
         db.session.commit()
