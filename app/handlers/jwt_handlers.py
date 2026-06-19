@@ -6,7 +6,7 @@ from app.extensions import db
 def missing_token(err):
     return {
         "status": "fail",
-        "message": "Authorization token is missing"
+        "message": "Missing or Invalid Authorization Header"
     }, 401
 
 @jwt.invalid_token_loader

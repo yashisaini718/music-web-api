@@ -31,7 +31,12 @@ swagger_template = {
 def create_app(config_class=Config):
     app=Flask(__name__)
     swagger=Swagger(app, template=swagger_template)
+
+    app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+        "pool_pre_ping": True
+    }
     app.config.from_object(config_class)
+    
     db.init_app(app)
     bcrypt.init_app(app)
     jwt.init_app(app)

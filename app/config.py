@@ -13,3 +13,4 @@ class Config:
     JWT_TOKEN_LOCATION=["headers"]
     JWT_HEADER_TYPE="Bearer"
     JWT_BLACKLIST_ENABLED=True
+

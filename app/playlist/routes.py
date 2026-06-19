@@ -62,7 +62,7 @@ class CreatePlaylistResource(Resource):
                 "description": "Missing or invalid JWT token",
                 "examples": {
                     "application/json": {
-                        "msg": "Missing Authorization Header"
+                        "msg": "Missing or Invalid Authorization Header"
                     }
                 }
             },
@@ -129,7 +129,7 @@ class ViewPlaylistResource(Resource):
                 "description": "Missing or invalid JWT token",
                 "examples": {
                     "application/json": {
-                        "msg": "Missing Authorization Header"
+                        "msg": "Missing or Invalid Authorization Header"
                     }
                 }
             },
@@ -197,7 +197,7 @@ class DeletePlaylistResource(Resource):
                 "description": "Missing or invalid JWT token",
                 "examples": {
                     "application/json": {
-                        "msg": "Missing Authorization Header"
+                        "msg": "Missing or Invalid Authorization Header"
                     }
                 }
             },
@@ -315,7 +315,7 @@ class AddPlaylistSongResource(Resource):
                 "description": "Missing or invalid JWT token",
                 "examples": {
                     "application/json": {
-                        "msg": "Missing Authorization Header"
+                        "msg": "Missing or Inalid Authorization Header"
                     }
                 }
             },
@@ -434,7 +434,7 @@ class ViewPlaylistSongResource(Resource):
                 "description": "Missing or invalid JWT token",
                 "examples": {
                     "application/json": {
-                        "msg": "Missing Authorization Header"
+                        "msg": "Missing or Invalid Authorization Header"
                     }
                 }
             },
@@ -525,7 +525,7 @@ class RemovePlaylistSongResource(Resource):
                 "description": "Missing or invalid JWT token",
                 "examples": {
                     "application/json": {
-                        "msg": "Missing Authorization Header"
+                        "msg": "Missing or Invalid Authorization Header"
                     }
                 }
             },

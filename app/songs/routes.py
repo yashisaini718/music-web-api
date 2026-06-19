@@ -155,7 +155,7 @@ class LikeSongResource(Resource):
                 "description": "Missing or invalid JWT token",
                 "examples": {
                     "application/json": {
-                        "msg": "Missing Authorization Header"
+                        "msg": "Missing or Invalid Authorization Header"
                     }
                 }
             },
@@ -258,7 +258,7 @@ class GetLikedSongResource(Resource):
                 "description": "Missing or invalid JWT token",
                 "examples": {
                     "application/json": {
-                        "msg": "Missing Authorization Header"
+                        "msg": "Missing or Invalid Authorization Header"
                     }
                 }
             }
@@ -334,7 +334,7 @@ class DeleteLikedSongResource(Resource):
                 "description": "Missing or invalid JWT token",
                 "examples": {
                     "application/json": {
-                        "msg": "Missing Authorization Header"
+                        "msg": "Missing or Invalid Authorization Header"
                     }
                 }
             },
@@ -401,7 +401,7 @@ class RecommendationResource(Resource):
                 "description": "Missing or invalid JWT token",
                 "examples": {
                     "application/json": {
-                        "msg": "Missing Authorization Header"
+                        "msg": "Missing or Invalid Authorization Header"
                     }
                 }
             },
