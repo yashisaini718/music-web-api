@@ -21,3 +21,7 @@ class Config:
     JWT_HEADER_TYPE="Bearer"
     JWT_BLACKLIST_ENABLED=True
 
+    CACHE_TYPE = 'FileSystemCache'
+    CACHE_DIR = '/tmp/flask_cache' 
+    CACHE_DEFAULT_TIMEOUT = 300
+

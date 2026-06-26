@@ -3,17 +3,20 @@ import requests
 import logging
 from sqlalchemy import or_
 from app.models import LikedSongs, Song
+from app.extensions import cache
 
 ITUNES_URL= "https://itunes.apple.com/search"
 
 
 #song searching logic
+@cache.memoize(timeout=300)
 def search_songs(query,entity,attribute):
     params={
         "term" : query,
         "entity" : entity,
         "attribute" : attribute,
-        "limit" : 15
+        "limit" : 15,
+        "timeout" : 5
     }
     try :
         response=requests.get(ITUNES_URL,params=params)

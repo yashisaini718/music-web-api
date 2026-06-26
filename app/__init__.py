@@ -1,6 +1,6 @@
 from flask import Flask
 from app.config import Config
-from app.extensions import db, bcrypt, jwt, migrate,cors
+from app.extensions import db, bcrypt, jwt, migrate, cache
 import logging
 from flasgger import Swagger
 
@@ -37,8 +37,8 @@ def create_app(config_class=Config):
     bcrypt.init_app(app)
     jwt.init_app(app)
     migrate.init_app(app,db)
-    #swagger.init_app(app)
-    cors.init_app(app)
+    cache.init_app(app)
+    
 
     from app.auth.routes import auth
     from app.songs.routes import songs
