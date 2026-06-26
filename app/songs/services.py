@@ -6,12 +6,14 @@ from app.models import LikedSongs, Song
 
 ITUNES_URL= "https://itunes.apple.com/search"
 
+
 #song searching logic
-def search_songs(query):
+def search_songs(query,entity,attribute):
     params={
         "term" : query,
-        "entity" : "song",
-        "limit" : 10
+        "entity" : entity,
+        "attribute" : attribute,
+        "limit" : 15
     }
     try :
         response=requests.get(ITUNES_URL,params=params)

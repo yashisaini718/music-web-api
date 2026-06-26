@@ -64,6 +64,8 @@ class SearchSongResource(Resource):
     })
     def get(self):
         query=request.args.get("q")
+        entity= request.args.get('entity','musicTrack') #default to songs
+        attribute= request.args.get('attribute','artistTerm') #default to artist names
         if not query :
             logging.warning(f"missing query parameter")
             return {
@@ -71,7 +73,7 @@ class SearchSongResource(Resource):
                 "message" : " query parameter 'q' is required"
             }, 400
         
-        songs=search_songs(query)
+        songs=search_songs(query,entity,attribute)
         if songs is None :
             return {
                 "status" : "fail",
